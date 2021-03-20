@@ -1,0 +1,53 @@
+service: bot-fraud-analyzer
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+package:
+  exclude:
+    - './**'
+    - '!src/**'
+
+useDotenv: true
+
+provider:
+  name: aws
+  stackName: slack-bot-fraud-analyzer
+  runtime: python3.8
+  region: us-east-1
+  environment:
+    SLACK_TOKEN: ${ env:SLACK_TOKEN }
+  apiGateway:
+    shouldStartNameWithService: true
+  lambdaHashingVersion: 20201221
+
+functions:
+  fraud-analyzer:
+    name: bot-fraud-analyzer
+    description: Analyzes user data to find possible fraud
+    handler: src/handler.main
+    memorySize: 128
+    timeout: 30
+    events:
+      - http:
+          method: POST
+          path: commands
+
+resources:
+  Resources:
+    LambdaSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: bot-fraud-analyzer
+        GroupDescription: allow postgresql connetction
+        VpcId: vpc-4e5aa123
+        SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: sg-c56f92aa

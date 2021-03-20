@@ -1,0 +1,9 @@
+.serverless
+.venv
+.vscode
+node_modules
+.env
+package-lock.json
+__pycache__
+
+fraud-scripts
