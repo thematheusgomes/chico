@@ -1,7 +1,4 @@
-import json
-
-
-def test_message():
+def block():
     return [
                 {
                     "type": "header",
